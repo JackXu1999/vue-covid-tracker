@@ -4,6 +4,10 @@
      <DataBoxes :stats="stats" />
       
      <CountrySelect @get-country="getCountryData" :countries="countries" />
+
+      <div v-if="selected">
+        <DataGraph :country="title"/>
+      </div>
      <div class="grid">
         <button @click="clearCountryData"
           v-if="stats.Country"
@@ -28,17 +32,20 @@
 import DataBoxes from '@/components/DataBoxes'
 import DataTitle from '@/components/DataTitle'
 import CountrySelect from '@/components/CountrySelect'
+import DataGraph from '@/components/DataGraph'
 
 export default {
   name: 'Home',
   components: {
     DataTitle,
     DataBoxes,
-    CountrySelect
+    CountrySelect,
+    DataGraph,
   },
   data() {
     return {
       loading: true,
+      selected: false,
       title: 'Global',
       dataDate: '',
       stats: {},
@@ -55,6 +62,7 @@ export default {
       return data;
     },
     getCountryData(country) {
+      this.selected = true;
       this.stats = country;
       this.title = country.Country;
       this.countryCode = country.CountryCode.toLowerCase();
@@ -66,11 +74,11 @@ export default {
       this.stats = data.Global;
       this.countryCode = '';
       this.loading = false;
+      this.selected = false;
     }
   },
   async created() {
     const data = await this.fetchCovidData();
-    
     this.dataDate = data.Date;
     this.stats = data.Global;
     this.countries = data.Countries;
